@@ -49,75 +49,6 @@
 
 static int current_power_profile = PROFILE_BALANCED;
 
-extern void interaction(int duration, int num_args, int opt_list[]);
-
-int get_number_of_profiles() {
-    return 5;
-}
-
-static int profile_high_performance[] = {
-    SCHED_BOOST_ON_V3, 0x1,
-    ALL_CPUS_PWR_CLPS_DIS_V3, 0x1,
-    CPUS_ONLINE_MIN_BIG, 0x2,
-    CPUS_ONLINE_MIN_LITTLE, 0x2,
-    MIN_FREQ_BIG_CORE_0, 0xFFF,
-    MIN_FREQ_LITTLE_CORE_0, 0xFFF,
-};
-
-static int profile_power_save[] = {
-    CPUS_ONLINE_MAX_LIMIT_BIG, 0x1,
-    MAX_FREQ_BIG_CORE_0, 0x3E8,
-    MAX_FREQ_LITTLE_CORE_0, 0x3E8,
-};
-
-static int profile_bias_power[] = {
-    MAX_FREQ_BIG_CORE_0, 0x514,
-    MAX_FREQ_LITTLE_CORE_0, 0x3E8,
-};
-
-static int profile_bias_performance[] = {
-    CPUS_ONLINE_MAX_LIMIT_BIG, 0x2,
-    CPUS_ONLINE_MAX_LIMIT_LITTLE, 0x2,
-    MIN_FREQ_BIG_CORE_0, 0x578,
-};
-
-static void set_power_profile(int profile) {
-
-    if (profile == current_power_profile)
-        return;
-
-    ALOGV("%s: Profile=%d", __func__, profile);
-
-    if (current_power_profile != PROFILE_BALANCED) {
-        undo_hint_action(DEFAULT_PROFILE_HINT_ID);
-        ALOGV("%s: Hint undone", __func__);
-    }
-
-    if (profile == PROFILE_POWER_SAVE) {
-        perform_hint_action(DEFAULT_PROFILE_HINT_ID, profile_power_save,
-                ARRAY_SIZE(profile_power_save));
-        ALOGD("%s: Set powersave mode", __func__);
-
-    } else if (profile == PROFILE_HIGH_PERFORMANCE) {
-        perform_hint_action(DEFAULT_PROFILE_HINT_ID, profile_high_performance,
-                ARRAY_SIZE(profile_high_performance));
-        ALOGD("%s: Set performance mode", __func__);
-
-    } else if (profile == PROFILE_BIAS_POWER) {
-        perform_hint_action(DEFAULT_PROFILE_HINT_ID, profile_bias_power,
-                ARRAY_SIZE(profile_bias_power));
-        ALOGD("%s: Set bias power mode", __func__);
-
-    } else if (profile == PROFILE_BIAS_PERFORMANCE) {
-        perform_hint_action(DEFAULT_PROFILE_HINT_ID, profile_bias_performance,
-                ARRAY_SIZE(profile_bias_performance));
-        ALOGD("%s: Set bias perf mode", __func__);
-
-    }
-
-    current_power_profile = profile;
-}
-
 static int process_video_encode_hint(void *metadata)
 {
     char governor[80];
@@ -197,42 +128,13 @@ static int process_video_encode_hint(void *metadata)
 int power_hint_override(__unused struct power_module *module,
         power_hint_t hint, void *data)
 {
-    static struct timespec s_previous_boost_timespec;
-    struct timespec cur_boost_timespec;
-    long long elapsed_time;
-    int duration;
-
-    int resources_launch[] = {
-        SCHED_BOOST_ON_V3, 0x1,
-        MAX_FREQ_BIG_CORE_0, 0xFFF,
-        MAX_FREQ_LITTLE_CORE_0, 0xFFF,
-        MIN_FREQ_BIG_CORE_0, 0xFFF,
-        MIN_FREQ_LITTLE_CORE_0, 0xFFF,
-        CPUBW_HWMON_MIN_FREQ, 0x8C,
-        ALL_CPUS_PWR_CLPS_DIS_V3, 0x1,
-        STOR_CLK_SCALE_DIS, 0x1,
-    };
-
-    int resources_cpu_boost[] = {
-        SCHED_BOOST_ON_V3, 0x1,
-        MIN_FREQ_BIG_CORE_0, 0x3E8,
-    };
-
-    int resources_interaction_fling_boost[] = {
-        CPUBW_HWMON_MIN_FREQ, 0x33,
-        MIN_FREQ_BIG_CORE_0, 0x3E8,
-        MIN_FREQ_LITTLE_CORE_0, 0x3E8,
-        SCHED_BOOST_ON_V3, 0x1,
-   //   SCHED_GROUP_ON, 0x1,
-    };
-
-    int resources_interaction_boost[] = {
-        MIN_FREQ_BIG_CORE_0, 0x3E8,
-    };
-
-    if (hint == POWER_HINT_SET_PROFILE) {
-        set_power_profile(*(int32_t *)data);
-        return HINT_HANDLED;
+    int ret_val = HINT_NONE;
+    switch(hint) {
+        case POWER_HINT_VIDEO_ENCODE:
+            ret_val = process_video_encode_hint(data);
+            break;
+        default:
+            break;
     }
 
     /* Skip other hints in power save mode */
