@@ -31,9 +31,8 @@
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <string.h>
 #include <stdlib.h>
-#include <sys/stat.h>
+#include <string.h>
 
 #include "utils.h"
 #include "list.h"
@@ -277,6 +276,7 @@ void interaction(int duration, int num_args, int opt_list[])
                 ALOGE("Failed to acquire lock.");
         }
     }
+#endif
 }
 
 void perform_hint_action(int hint_id, int resource_values[], int num_resources)
