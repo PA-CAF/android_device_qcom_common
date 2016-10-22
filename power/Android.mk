@@ -1,6 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 
-ifneq ($(TARGET_USES_DEVICE_SPECIFIC_POWERHAL), true)
+ifneq ($(TARGET_USES_AOSP),true)
 ifeq ($(call is-vendor-board-platform,QCOM),true)
 
 ifneq (,$(filter true,$(USE_ME) $(WITH_QC_PERF)))
