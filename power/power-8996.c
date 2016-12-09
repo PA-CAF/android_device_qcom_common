@@ -194,7 +194,30 @@ int power_hint_override(__unused struct power_module *module,
     return HINT_NONE;
 }
 
-int set_interactive_override(__unused struct power_module *module, int on)
+/*
+ * Contains chipset/target specific handling
+ * for Sustained performance mode.
+ */
+void toggle_sustained_performance(bool request_enable)
+{
+    static int handle_sustained_performance = 0;
+
+    if (request_enable) {
+        /*
+         * Limit CPU frequency to 1.3Ghz
+         * Set maximum GPU power level to 4
+         * Set interactive timer rate to 40ms
+         */
+        int resources[] = {0x40804000, 0x514, 0x40804100, 0x514, 0x41424000, 0x28, 0x41424100, 0x28, 0X42808000, 0x4};
+        handle_sustained_performance = interaction_with_handle(
+                 handle_sustained_performance, 0,
+                 sizeof(resources) / sizeof(resources[0]), resources);
+    } else {
+        release_request(handle_sustained_performance);
+    }
+}
+
+int set_interactive_override(struct power_module *module, int on)
 {
     char governor[80];
 
