@@ -41,9 +41,8 @@ void unvote_ondemand_sdf_low();
 void perform_hint_action(int hint_id, int resource_values[],
     int num_resources);
 void undo_hint_action(int hint_id);
-void undo_initial_hint_action();
-void set_profile(int profile);
-void start_prefetch(int pid, const char *packageName);
+void release_request(int lock_handle);
+int interaction_with_handle(int lock_handle, int duration, int num_args, int opt_list[]);
 
 long long calc_timespan_us(struct timespec start, struct timespec end);
 int get_soc_id(void);
