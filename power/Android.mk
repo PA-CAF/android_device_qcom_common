@@ -1,9 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
-# Hey Mr. Make Author, DIAF PLX
-ifeq ($(TARGET_POWERHAL_VARIANT),qcom)
-USE_ME := true
-endif
+ifneq ($(TARGET_USES_DEVICE_SPECIFIC_POWERHAL), true)
+ifeq ($(call is-vendor-board-platform,QCOM),true)
 
 ifneq (,$(filter true,$(USE_ME) $(WITH_QC_PERF)))
 
@@ -96,4 +94,5 @@ endif
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_SHARED_LIBRARY)
 
-endif # TARGET_POWERHAL_VARIANT == qcom || WITH_QC_PERF
+endif
+endif
