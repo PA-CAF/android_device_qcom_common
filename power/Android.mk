@@ -1,7 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 
 ifneq ($(TARGET_USES_DEVICE_SPECIFIC_POWERHAL), true)
-ifneq ($(TARGET_USES_AOSP),true)
 ifeq ($(call is-vendor-board-platform,QCOM),true)
 
 ifneq (,$(filter true,$(USE_ME) $(WITH_QC_PERF)))
@@ -107,6 +106,5 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS := -Wno-unused-parameter -Wno-unused-variable
 include $(BUILD_SHARED_LIBRARY)
 
-endif
 endif
 endif
