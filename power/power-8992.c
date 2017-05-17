@@ -248,12 +248,13 @@ int set_interactive_override(__attribute__((unused)) struct power_module *module
         /* Display off */
         if ((strncmp(governor, INTERACTIVE_GOVERNOR, strlen(INTERACTIVE_GOVERNOR)) == 0) &&
             (strlen(governor) == strlen(INTERACTIVE_GOVERNOR))) {
-            // sched upmigrate = 99, sched downmigrate = 95
-            // keep the big cores around, but make them very hard to use
-            int resource_values[] = { 0x4E63, 0x4F5F };
-            perform_hint_action(DISPLAY_STATE_HINT_ID,
-                    resource_values, ARRAY_SIZE(resource_values));
-            return HINT_HANDLED;
+            int resource_values[] = {0x41004000, 0x0, 0x41410100, 0x64, 0x41410000, 0x64}; /* 4+0 core config in display off */
+            if (!display_hint_sent) {
+                perform_hint_action(DISPLAY_STATE_HINT_ID,
+                resource_values, sizeof(resource_values)/sizeof(resource_values[0]));
+                display_hint_sent = 1;
+                return HINT_HANDLED;
+            }
         }
     } else {
         /* Display on */
