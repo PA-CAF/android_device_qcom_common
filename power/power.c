@@ -189,7 +189,16 @@ extern void interaction(int duration, int num_args, int opt_list[]);
 static void power_hint(__attribute__((unused)) struct power_module *module, power_hint_t hint,
         void *data)
 {
-    pthread_mutex_lock(&hint_mutex);
+    /* Sustained performance mode */
+    if (hint == POWER_HINT_SUSTAINED_PERFORMANCE) {
+        pthread_mutex_lock(&sustained_performance_toggle_lock);
+
+        /* Execute the change in SPM mode */
+        toggle_sustained_performance(data);
+        sustained_performance_mode = data;
+
+        pthread_mutex_unlock(&sustained_performance_toggle_lock);
+    }
 
     /* Check if this hint has been overridden. */
     if (power_hint_override(module, hint, data) == HINT_HANDLED) {
@@ -199,6 +208,7 @@ static void power_hint(__attribute__((unused)) struct power_module *module, powe
 
     switch(hint) {
         case POWER_HINT_VSYNC:
+        break;
         case POWER_HINT_INTERACTION:
         case POWER_HINT_CPU_BOOST:
         case POWER_HINT_SET_PROFILE:
