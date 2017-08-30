@@ -30,7 +30,7 @@ ifneq ($(TARGET_USES_AOSP_CAMERA),true)
 PRODUCT_PACKAGES += SnapdragonCamera
 endif
 
-TARGET_CRYPTFS_HW_PATH := device/qcom/common/cryptfs_hw
+TARGET_CRYPTFS_HW_PATH := vendor/qcom/opensource/cryptfs_hw
 
 # SECCOMP Extension
 BOARD_SECCOMP_POLICY += device/qcom/common/seccomp
